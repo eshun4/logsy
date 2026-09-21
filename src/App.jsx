@@ -1,9 +1,16 @@
 import { useState } from 'react'
 import './App.css'
 
+const FILTERS = {
+  all: 'All',
+  active: 'Active',
+  completed: 'Completed',
+}
+
 function App() {
   const [taskTitle, setTaskTitle] = useState('')
   const [tasks, setTasks] = useState([])
+  const [selectedFilter, setSelectedFilter] = useState('all')
 
   function handleSubmit(event) {
     event.preventDefault()
@@ -41,6 +48,48 @@ function App() {
   }
 
   const completedCount = tasks.filter((task) => task.completed).length
+
+  const filteredTasks = tasks.filter((task) => {
+    if (selectedFilter === 'active') {
+      return !task.completed
+    }
+
+    if (selectedFilter === 'completed') {
+      return task.completed
+    }
+
+    return true
+  })
+
+  function getEmptyMessage() {
+    if (tasks.length === 0) {
+      return {
+        title: 'No tasks yet.',
+        detail: 'Add your first task using the form above.',
+      }
+    }
+
+    if (selectedFilter === 'active') {
+      return {
+        title: 'No active tasks.',
+        detail: 'Everything has been completed.',
+      }
+    }
+
+    if (selectedFilter === 'completed') {
+      return {
+        title: 'No completed tasks.',
+        detail: 'Complete a task to see it here.',
+      }
+    }
+
+    return {
+      title: 'No tasks found.',
+      detail: 'Try selecting another filter.',
+    }
+  }
+
+  const emptyMessage = getEmptyMessage()
 
   return (
     <main className="app-shell">
@@ -86,14 +135,29 @@ function App() {
             </span>
           </div>
 
-          {tasks.length === 0 ? (
+          <div className="filter-bar" aria-label="Filter tasks">
+            {Object.entries(FILTERS).map(([filterValue, filterLabel]) => (
+              <button
+                className={
+                  selectedFilter === filterValue ? 'filter-active' : ''
+                }
+                type="button"
+                key={filterValue}
+                onClick={() => setSelectedFilter(filterValue)}
+              >
+                {filterLabel}
+              </button>
+            ))}
+          </div>
+
+          {filteredTasks.length === 0 ? (
             <div className="empty-state">
-              <p>No tasks yet.</p>
-              <span>Add your first task using the form above.</span>
+              <p>{emptyMessage.title}</p>
+              <span>{emptyMessage.detail}</span>
             </div>
           ) : (
             <ul className="task-list">
-              {tasks.map((task) => (
+              {filteredTasks.map((task) => (
                 <li
                   className={`task-item ${task.completed ? 'task-item-completed' : ''
                     }`}
