@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
+
+const STORAGE_KEY = 'logsy-tasks'
 
 const FILTERS = {
   all: 'All',
@@ -7,10 +9,30 @@ const FILTERS = {
   completed: 'Completed',
 }
 
+function loadSavedTasks() {
+  try {
+    const savedTasks = localStorage.getItem(STORAGE_KEY)
+
+    if (!savedTasks) {
+      return []
+    }
+
+    const parsedTasks = JSON.parse(savedTasks)
+
+    return Array.isArray(parsedTasks) ? parsedTasks : []
+  } catch {
+    return []
+  }
+}
+
 function App() {
   const [taskTitle, setTaskTitle] = useState('')
-  const [tasks, setTasks] = useState([])
+  const [tasks, setTasks] = useState(loadSavedTasks)
   const [selectedFilter, setSelectedFilter] = useState('all')
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
+  }, [tasks])
 
   function handleSubmit(event) {
     event.preventDefault()
