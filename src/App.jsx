@@ -28,6 +28,7 @@ function loadSavedTasks() {
 function App() {
   const [taskTitle, setTaskTitle] = useState('')
   const [dueDate, setDueDate] = useState('')
+  const [priority, setPriority] = useState('medium')
   const [tasks, setTasks] = useState(loadSavedTasks)
   const [selectedFilter, setSelectedFilter] = useState('all')
 
@@ -48,12 +49,14 @@ function App() {
       id: crypto.randomUUID(),
       title: trimmedTitle,
       dueDate,
+      priority,
       completed: false,
     }
 
     setTasks((currentTasks) => [newTask, ...currentTasks])
     setTaskTitle('')
     setDueDate('')
+    setPriority('medium')
   }
 
   function toggleTask(taskId) {
@@ -149,6 +152,17 @@ function App() {
               aria-label="Task due date"
             />
 
+            <select
+              id="task-priority"
+              value={priority}
+              onChange={(event) => setPriority(event.target.value)}
+              aria-label="Task priority"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+
             <button type="submit">Add task</button>
           </div>
         </form>
@@ -192,9 +206,8 @@ function App() {
             <ul className="task-list">
               {filteredTasks.map((task) => (
                 <li
-                  className={`task-item ${
-                    task.completed ? 'task-item-completed' : ''
-                  }`}
+                  className={`task-item ${task.completed ? 'task-item-completed' : ''
+                    }`}
                   key={task.id}
                 >
                   <label className="task-content">
@@ -207,14 +220,25 @@ function App() {
                     <span className="task-details">
                       <span className="task-title">{task.title}</span>
 
-                      {task.dueDate && (
-                        <small className="task-due-date">
-                          Due:{' '}
-                          {new Date(
-                            `${task.dueDate}T00:00:00`,
-                          ).toLocaleDateString()}
-                        </small>
-                      )}
+                      <span className="task-meta">
+                        <span
+                          className={`priority-badge priority-${task.priority || 'medium'
+                            }`}
+                        >
+                          {task.priority
+                            ? `${task.priority.charAt(0).toUpperCase()}${task.priority.slice(1)} priority`
+                            : 'Medium priority'}
+                        </span>
+
+                        {task.dueDate && (
+                          <small className="task-due-date">
+                            Due:{' '}
+                            {new Date(
+                              `${task.dueDate}T00:00:00`,
+                            ).toLocaleDateString()}
+                          </small>
+                        )}
+                      </span>
                     </span>
                   </label>
 
