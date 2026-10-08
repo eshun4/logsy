@@ -27,6 +27,7 @@ function loadSavedTasks() {
 
 function App() {
   const [taskTitle, setTaskTitle] = useState('')
+  const [dueDate, setDueDate] = useState('')
   const [tasks, setTasks] = useState(loadSavedTasks)
   const [selectedFilter, setSelectedFilter] = useState('all')
 
@@ -46,11 +47,13 @@ function App() {
     const newTask = {
       id: crypto.randomUUID(),
       title: trimmedTitle,
+      dueDate,
       completed: false,
     }
 
     setTasks((currentTasks) => [newTask, ...currentTasks])
     setTaskTitle('')
+    setDueDate('')
   }
 
   function toggleTask(taskId) {
@@ -138,6 +141,14 @@ function App() {
               autoComplete="off"
             />
 
+            <input
+              id="task-due-date"
+              type="date"
+              value={dueDate}
+              onChange={(event) => setDueDate(event.target.value)}
+              aria-label="Task due date"
+            />
+
             <button type="submit">Add task</button>
           </div>
         </form>
@@ -181,8 +192,9 @@ function App() {
             <ul className="task-list">
               {filteredTasks.map((task) => (
                 <li
-                  className={`task-item ${task.completed ? 'task-item-completed' : ''
-                    }`}
+                  className={`task-item ${
+                    task.completed ? 'task-item-completed' : ''
+                  }`}
                   key={task.id}
                 >
                   <label className="task-content">
@@ -192,7 +204,18 @@ function App() {
                       onChange={() => toggleTask(task.id)}
                     />
 
-                    <span>{task.title}</span>
+                    <span className="task-details">
+                      <span className="task-title">{task.title}</span>
+
+                      {task.dueDate && (
+                        <small className="task-due-date">
+                          Due:{' '}
+                          {new Date(
+                            `${task.dueDate}T00:00:00`,
+                          ).toLocaleDateString()}
+                        </small>
+                      )}
+                    </span>
                   </label>
 
                   <button
