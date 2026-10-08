@@ -32,6 +32,11 @@ function App() {
   const [tasks, setTasks] = useState(loadSavedTasks)
   const [selectedFilter, setSelectedFilter] = useState('all')
 
+  const [editingTaskId, setEditingTaskId] = useState(null)
+  const [editingTitle, setEditingTitle] = useState('')
+  const [editingDueDate, setEditingDueDate] = useState('')
+  const [editingPriority, setEditingPriority] = useState('medium')
+
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
   }, [tasks])
@@ -73,6 +78,47 @@ function App() {
     setTasks((currentTasks) =>
       currentTasks.filter((task) => task.id !== taskId),
     )
+
+    if (editingTaskId === taskId) {
+      cancelEditing()
+    }
+  }
+
+  function startEditing(task) {
+    setEditingTaskId(task.id)
+    setEditingTitle(task.title)
+    setEditingDueDate(task.dueDate || '')
+    setEditingPriority(task.priority || 'medium')
+  }
+
+  function cancelEditing() {
+    setEditingTaskId(null)
+    setEditingTitle('')
+    setEditingDueDate('')
+    setEditingPriority('medium')
+  }
+
+  function saveEditing(taskId) {
+    const trimmedTitle = editingTitle.trim()
+
+    if (!trimmedTitle) {
+      return
+    }
+
+    setTasks((currentTasks) =>
+      currentTasks.map((task) =>
+        task.id === taskId
+          ? {
+            ...task,
+            title: trimmedTitle,
+            dueDate: editingDueDate,
+            priority: editingPriority,
+          }
+          : task,
+      ),
+    )
+
+    cancelEditing()
   }
 
   const completedCount = tasks.filter((task) => task.completed).length
@@ -210,46 +256,114 @@ function App() {
                     }`}
                   key={task.id}
                 >
-                  <label className="task-content">
-                    <input
-                      type="checkbox"
-                      checked={task.completed}
-                      onChange={() => toggleTask(task.id)}
-                    />
+                  {editingTaskId === task.id ? (
+                    <div className="edit-task-form">
+                      <input
+                        type="text"
+                        value={editingTitle}
+                        onChange={(event) =>
+                          setEditingTitle(event.target.value)
+                        }
+                        aria-label="Edit task title"
+                      />
 
-                    <span className="task-details">
-                      <span className="task-title">{task.title}</span>
+                      <input
+                        type="date"
+                        value={editingDueDate}
+                        onChange={(event) =>
+                          setEditingDueDate(event.target.value)
+                        }
+                        aria-label="Edit task due date"
+                      />
 
-                      <span className="task-meta">
-                        <span
-                          className={`priority-badge priority-${task.priority || 'medium'
-                            }`}
+                      <select
+                        value={editingPriority}
+                        onChange={(event) =>
+                          setEditingPriority(event.target.value)
+                        }
+                        aria-label="Edit task priority"
+                      >
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                      </select>
+
+                      <div className="edit-actions">
+                        <button
+                          className="save-button"
+                          type="button"
+                          onClick={() => saveEditing(task.id)}
                         >
-                          {task.priority
-                            ? `${task.priority.charAt(0).toUpperCase()}${task.priority.slice(1)} priority`
-                            : 'Medium priority'}
+                          Save
+                        </button>
+
+                        <button
+                          className="cancel-button"
+                          type="button"
+                          onClick={cancelEditing}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <label className="task-content">
+                        <input
+                          type="checkbox"
+                          checked={task.completed}
+                          onChange={() => toggleTask(task.id)}
+                        />
+
+                        <span className="task-details">
+                          <span className="task-title">{task.title}</span>
+
+                          <span className="task-meta">
+                            <span
+                              className={`priority-badge priority-${task.priority || 'medium'
+                                }`}
+                            >
+                              {task.priority
+                                ? `${task.priority
+                                  .charAt(0)
+                                  .toUpperCase()}${task.priority.slice(
+                                    1,
+                                  )} priority`
+                                : 'Medium priority'}
+                            </span>
+
+                            {task.dueDate && (
+                              <small className="task-due-date">
+                                Due:{' '}
+                                {new Date(
+                                  `${task.dueDate}T00:00:00`,
+                                ).toLocaleDateString()}
+                              </small>
+                            )}
+                          </span>
                         </span>
+                      </label>
 
-                        {task.dueDate && (
-                          <small className="task-due-date">
-                            Due:{' '}
-                            {new Date(
-                              `${task.dueDate}T00:00:00`,
-                            ).toLocaleDateString()}
-                          </small>
-                        )}
-                      </span>
-                    </span>
-                  </label>
+                      <div className="task-actions">
+                        <button
+                          className="edit-button"
+                          type="button"
+                          onClick={() => startEditing(task)}
+                        >
+                          Edit
+                        </button>
 
-                  <button
-                    className="delete-button"
-                    type="button"
-                    onClick={() => deleteTask(task.id)}
-                    aria-label={`Delete ${task.title}`}
-                  >
-                    Delete
-                  </button>
+                        <button
+                          className="delete-button"
+                          type="button"
+                          onClick={() => deleteTask(task.id)}
+                          aria-label={`Delete ${task.title}`}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>

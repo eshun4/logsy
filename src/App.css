@@ -289,22 +289,94 @@
   opacity: 0.6;
 }
 
-.delete-button {
-  background: transparent;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  color: #dc2626;
-  cursor: pointer;
+.task-actions {
+  display: flex;
   flex-shrink: 0;
+  gap: 8px;
+}
+
+.edit-button,
+.delete-button,
+.save-button,
+.cancel-button {
+  border-radius: 8px;
+  cursor: pointer;
   font-size: 0.82rem;
   font-weight: 750;
   padding: 7px 11px;
   transition: 0.2s ease;
 }
 
+.edit-button {
+  background: transparent;
+  border: 1px solid #bfdbfe;
+  color: #2563eb;
+}
+
+.edit-button:hover {
+  background: #eff6ff;
+  border-color: #60a5fa;
+}
+
+.delete-button {
+  background: transparent;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
 .delete-button:hover {
   background: #fef2f2;
   border-color: #f87171;
+}
+
+.edit-task-form {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+.edit-task-form input,
+.edit-task-form select {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  color: #0f172a;
+  outline: none;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+.edit-task-form input:focus,
+.edit-task-form select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.save-button {
+  background: #2563eb;
+  border: 1px solid #2563eb;
+  color: #ffffff;
+}
+
+.save-button:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.cancel-button {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
+.cancel-button:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
 }
 
 @media (max-width: 700px) {
@@ -347,5 +419,18 @@
 
   .task-item {
     align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .task-actions {
+    width: 100%;
+  }
+
+  .task-actions button {
+    flex: 1;
+  }
+
+  .edit-actions button {
+    flex: 1;
   }
 }
