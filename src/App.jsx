@@ -64,15 +64,17 @@ function App() {
     setPriority('medium')
   }
 
+
   function toggleTask(taskId) {
     setTasks((currentTasks) =>
       currentTasks.map((task) =>
         task.id === taskId
-          ? { ...task, completed: !task.completed }
+          ? { ...task, completed: true }
           : task,
       ),
     )
   }
+
 
   function deleteTask(taskId) {
     setTasks((currentTasks) =>
